@@ -1,0 +1,126 @@
+:root {
+    --bg-matte-black: #121214; /* Preto fosco que não cansa os olhos */
+    --dracula-purple: #282a36;
+    --dracula-pink: #ff79c6;
+    --dracula-yellow: #f1fa8c;
+    --text-color: #e2e2e5;
+    
+    /* Modo Claro Econômico (Papel de carta antigo/Sépia) */
+    --bg-light: #f5eedc;
+    --text-light: #1a1a1a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Georgia', serif;
+    background-color: var(--bg-matte-black);
+    color: var(--text-color);
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* Canvas das Estrelas ocupando o fundo */
+#starsCanvas {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.app-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* 🌟 Efeito Ouro Polido e Reflexivo na Capa */
+.gold-title {
+    font-size: 3.5rem;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, #a67c1e 0%, #fbf5b7 25%, #ca9e3a 50%, #fbf5b7 75%, #aa771c 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.5));
+    background-size: 400% 400%;
+    animation: goldShine 6s ease infinite;
+}
+
+@keyframes goldShine {
+    0% { background-position: 0% 50% }
+    50% { background-position: 100% 50% }
+    100% { background-position: 0% 50% }
+}
+
+/* Input Minimalista */
+#omni-search {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    background: rgba(40, 42, 54, 0.6); /* Transparência Dracula */
+    color: #fff;
+    font-size: 1.1rem;
+    text-align: center;
+    outline: none;
+    transition: all 0.3s;
+}
+#omni-search:focus {
+    border-color: var(--dracula-pink);
+    box-shadow: 0 0 10px rgba(255, 121, 198, 0.2);
+}
+
+/* Viewport do Livro para a animação leve */
+.book-viewport {
+    flex: 1;
+    margin: 20px 0;
+    perspective: 1200px; /* Cria o ambiente 3D para virar a página */
+}
+
+.page-flip-container {
+    width: 100%;
+    height: 100%;
+    background: #181920;
+    border-radius: 6px;
+    padding: 25px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.6), 0 10px 25px rgba(0,0,0,0.5);
+    transform-style: preserve-3d;
+    transition: transform 0.4s ease-in-out, opacity 0.3s;
+}
+
+/* Efeito de virada de página (Pura matemática de rotação CSS) */
+.page-flip-animation-left {
+    transform: rotateY(-30deg) skewY(2deg) scale(0.95);
+    opacity: 0;
+}
+.page-flip-animation-right {
+    transform: rotateY(30deg) skewY(-2deg) scale(0.95);
+    opacity: 0;
+}
+
+/* Tarja do Marcador de Texto */
+.highlight-marker {
+    background-color: var(--dracula-pink);
+    color: #000;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+    box-shadow: 0 0 8px var(--dracula-pink);
+}
+
+/* Rodapé Pegasus solicitado */
+.pegasus-footer {
+    text-align: center;
+    font-size: 0.75rem;
+    font-family: monospace;
+    letter-spacing: 2px;
+    opacity: 0.25;
+    padding-bottom: 5px;
+}
