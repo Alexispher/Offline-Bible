@@ -1,13 +1,9 @@
 :root {
-    --bg-matte-black: #121214; /* Preto fosco que não cansa os olhos */
+    --bg-matte-black: #121214;
     --dracula-purple: #282a36;
     --dracula-pink: #ff79c6;
     --dracula-yellow: #f1fa8c;
     --text-color: #e2e2e5;
-    
-    /* Modo Claro Econômico (Papel de carta antigo/Sépia) */
-    --bg-light: #f5eedc;
-    --text-light: #1a1a1a;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -16,11 +12,11 @@ body {
     font-family: 'Georgia', serif;
     background-color: var(--bg-matte-black);
     color: var(--text-color);
-    overflow: hidden;
+    overflow: hidden; /* Trava a rolagem da página inteira */
     height: 100vh;
 }
 
-/* Canvas das Estrelas ocupando o fundo */
+/* Canvas das Estrelas */
 #starsCanvas {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
@@ -28,8 +24,9 @@ body {
     pointer-events: none;
 }
 
+/* Layout Principal */
 .app-container {
-    max-width: 600px;
+    max-width: 650px;
     margin: 0 auto;
     padding: 20px;
     height: 100vh;
@@ -38,7 +35,7 @@ body {
     justify-content: space-between;
 }
 
-/* 🌟 Efeito Ouro Polido e Reflexivo na Capa */
+/* Título em Ouro Polido */
 .gold-title {
     font-size: 3.5rem;
     text-align: center;
@@ -51,6 +48,7 @@ body {
     filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.5));
     background-size: 400% 400%;
     animation: goldShine 6s ease infinite;
+    margin-bottom: 20px;
 }
 
 @keyframes goldShine {
@@ -59,68 +57,100 @@ body {
     100% { background-position: 0% 50% }
 }
 
-/* Input Minimalista */
+/* Barra de Busca */
 #omni-search {
     width: 100%;
-    padding: 12px;
+    padding: 15px;
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 8px;
-    background: rgba(40, 42, 54, 0.6); /* Transparência Dracula */
+    background: rgba(40, 42, 54, 0.8);
     color: #fff;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     text-align: center;
     outline: none;
     transition: all 0.3s;
 }
+
 #omni-search:focus {
     border-color: var(--dracula-pink);
-    box-shadow: 0 0 10px rgba(255, 121, 198, 0.2);
+    box-shadow: 0 0 15px rgba(255, 121, 198, 0.3);
 }
 
-/* Viewport do Livro para a animação leve */
+/* Container do Livro e Animação 3D */
 .book-viewport {
     flex: 1;
     margin: 20px 0;
-    perspective: 1200px; /* Cria o ambiente 3D para virar a página */
+    perspective: 1200px;
+    min-height: 0; /* Importante para o flexbox permitir rolagem interna */
 }
 
 .page-flip-container {
     width: 100%;
     height: 100%;
     background: #181920;
-    border-radius: 6px;
+    border-radius: 8px;
     padding: 25px;
     box-shadow: inset 0 0 20px rgba(0,0,0,0.6), 0 10px 25px rgba(0,0,0,0.5);
     transform-style: preserve-3d;
     transition: transform 0.4s ease-in-out, opacity 0.3s;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Efeito de virada de página (Pura matemática de rotação CSS) */
+/* Animação CSS da Página */
 .page-flip-animation-left {
     transform: rotateY(-30deg) skewY(2deg) scale(0.95);
     opacity: 0;
 }
-.page-flip-animation-right {
-    transform: rotateY(30deg) skewY(-2deg) scale(0.95);
-    opacity: 0;
+
+/* Área de Leitura (Com Rolagem Interna) */
+#display-text {
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 15px; /* Espaço para a barra de rolagem */
+    scroll-behavior: smooth;
 }
 
-/* Tarja do Marcador de Texto */
+.instruction-text {
+    text-align: center;
+    margin-top: 20%;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.1rem;
+}
+
+/* Tarja Marca-Texto */
 .highlight-marker {
     background-color: var(--dracula-pink);
-    color: #000;
+    color: #121214;
     font-weight: bold;
-    padding: 2px 6px;
+    padding: 3px 6px;
     border-radius: 4px;
     box-shadow: 0 0 8px var(--dracula-pink);
+    transition: background-color 0.3s;
 }
 
-/* Rodapé Pegasus solicitado */
+/* Personalização da Barra de Rolagem (Estilo Dark) */
+#display-text::-webkit-scrollbar {
+    width: 8px;
+}
+#display-text::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+#display-text::-webkit-scrollbar-thumb {
+    background: var(--dracula-purple);
+    border-radius: 4px;
+}
+#display-text::-webkit-scrollbar-thumb:hover {
+    background: var(--dracula-pink);
+}
+
+/* Rodapé */
 .pegasus-footer {
     text-align: center;
     font-size: 0.75rem;
     font-family: monospace;
     letter-spacing: 2px;
     opacity: 0.25;
-    padding-bottom: 5px;
+    padding-bottom: 10px;
 }
