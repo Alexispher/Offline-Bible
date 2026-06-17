@@ -2,52 +2,149 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tanakh - Pegasus Framework</title>
+
+    <meta 
+        name="viewport" 
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta 
+        name="description" 
+        content="Pegasus Offline Reader - leitor bíblico offline em formato de livro digital."
+    >
+
+    <title>Tanakh - Pegasus Offline Reader</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <!-- Fundo de Estrelas -->
-    <canvas id="starsCanvas"></canvas>
+    <!-- Fundo animado em canvas -->
+    <canvas id="starsCanvas" aria-hidden="true"></canvas>
 
     <div class="app-container">
-        
-        <!-- ESTADO 1: A CAPA DO LIVRO -->
-        <div id="book-cover" class="book-layer active">
-            <div class="spine"></div> <!-- Lombada do livro -->
+
+        <!-- ==========================================
+             ESTADO 1: CAPA DO LIVRO
+        =========================================== -->
+        <section id="book-cover" class="book-layer active" aria-label="Capa do livro">
+            <div class="spine"></div>
+
             <div class="cover-content">
                 <h1 class="gold-title">Tanakh</h1>
-                <p class="cover-subtitle">PEGASUS OFFLINE READER</p>
-                <button id="btn-open-book">Abrir o Livro</button>
-                <button id="btn-continue" class="hidden">Continuar Leitura</button>
-            </div>
-        </div>
 
-        <!-- ESTADO 2: O LIVRO ABERTO -->
-        <div id="book-inside" class="book-layer hidden">
-            <!-- Cabeçalho Estratégico -->
-            <div class="reader-header">
-                <button id="btn-close-book" title="Fechar Livro">✕</button>
-                <input type="text" id="omni-search" placeholder="Busca Rápida (Ex: gn 1 ou genesis 1 1)" autocomplete="off">
-                <!-- Marcador de Fita Visual -->
-                <div id="bookmark-ribbon" title="Marcar esta página"></div>
-            </div>
+                <p class="cover-subtitle">
+                    PEGASUS OFFLINE READER
+                </p>
 
-            <!-- Área de Leitura -->
-            <div class="reader-page" id="display-text">
-                <div class="instruction-text">
-                    <p>O livro está aberto.</p>
-                    <p>Use a barra superior para buscar.</p>
-                </div>
+                <button id="btn-open-book" type="button">
+                    Abrir o Livro
+                </button>
+
+                <button id="btn-continue" type="button" class="hidden">
+                    Continuar Leitura
+                </button>
             </div>
-        </div>
+        </section>
+
+        <!-- ==========================================
+             ESTADO 2: LIVRO ABERTO
+        =========================================== -->
+        <section id="book-inside" class="book-layer hidden" aria-label="Livro aberto">
+            <div class="reader-shell">
+
+                <!-- Marcadores laterais dos livros -->
+                <aside 
+                    id="book-tabs" 
+                    class="book-tabs" 
+                    aria-label="Marcadores dos livros"
+                ></aside>
+
+                <!-- Conteúdo principal do leitor -->
+                <main class="reader-content">
+
+                    <header class="reader-header">
+                        <button 
+                            id="btn-close-book" 
+                            type="button" 
+                            title="Fechar livro" 
+                            aria-label="Fechar livro"
+                        >
+                            ✕
+                        </button>
+
+                        <button 
+                            id="btn-prev-page" 
+                            class="page-btn" 
+                            type="button" 
+                            title="Capítulo anterior" 
+                            aria-label="Capítulo anterior"
+                        >
+                            ‹
+                        </button>
+
+                        <input 
+                            type="text" 
+                            id="omni-search" 
+                            placeholder="Busca rápida: gn 1 ou gn 1 1" 
+                            autocomplete="off"
+                            aria-label="Campo de busca bíblica"
+                        >
+
+                        <button 
+                            id="btn-go-page" 
+                            class="go-btn" 
+                            type="button" 
+                            title="Ir para a referência"
+                            aria-label="Ir para a referência digitada"
+                        >
+                            Ir
+                        </button>
+
+                        <button 
+                            id="btn-next-page" 
+                            class="page-btn" 
+                            type="button" 
+                            title="Próximo capítulo" 
+                            aria-label="Próximo capítulo"
+                        >
+                            ›
+                        </button>
+
+                        <button 
+                            id="bookmark-ribbon" 
+                            type="button" 
+                            title="Marcar esta página" 
+                            aria-label="Marcar esta página"
+                        ></button>
+                    </header>
+
+                    <div id="page-status" class="page-status">
+                        Selecione um livro ou digite uma referência.
+                    </div>
+
+                    <article class="reader-page" id="display-text">
+                        <div class="instruction-text">
+                            <p>O livro está aberto.</p>
+                            <p>Use a barra superior ou os marcadores laterais.</p>
+                        </div>
+                    </article>
+
+                </main>
+            </div>
+        </section>
 
         <footer class="pegasus-footer">
             MADE BY PEGASUS FRAMEWORK
         </footer>
     </div>
 
-    <!-- 1º O Banco de Dados, 2º O Motor -->
+    <!-- 
+        IMPORTANTE:
+        O arquivo biblia.js precisa vir antes do app.js.
+        Ele deve declarar:
+        window.BIBLIA_TANAKH = [...]
+    -->
     <script src="biblia.js"></script>
     <script src="app.js"></script>
 </body>
