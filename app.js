@@ -1,5 +1,5 @@
 // ==========================================
-// 1. MOTOR DAS ESTRELAS (Manteve-se o mesmo, leve e rápido)
+// 1. MOTOR MATEMÁTICO DE ESTRELAS (CANVAS)
 // ==========================================
 const canvas = document.getElementById('starsCanvas');
 const ctx = canvas.getContext('2d');
@@ -13,7 +13,8 @@ function resizeCanvas() {
 
 function initStars() {
     stars = [];
-    for(let i=0; i<80; i++) {
+    const numStars = 80; // Quantidade leve
+    for(let i=0; i<numStars; i++) {
         stars.push({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
@@ -30,6 +31,7 @@ function animateStars() {
         let s = stars[i];
         s.alpha += s.speed;
         if(s.alpha > 1 || s.alpha < 0) s.speed = -s.speed;
+        
         ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(s.alpha)})`;
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
@@ -41,6 +43,7 @@ function animateStars() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 animateStars();
+
 
 // ==========================================
 // 2. NAVEGAÇÃO: CAPA vs LIVRO ABERTO
@@ -70,35 +73,45 @@ function closeBook() {
 btnOpen.addEventListener('click', openBook);
 btnClose.addEventListener('click', closeBook);
 
+
 // ==========================================
-// 3. MOTOR DE BUSCA E MARCADOR DE FITA
+// 3. MOTOR DE BUSCA (ATUALIZADO PARA O NOVO JSON)
 // ==========================================
 const displayText = document.getElementById('display-text');
 const ribbon = document.getElementById('bookmark-ribbon');
-let currentReadingPosition = ""; // Guarda o que está sendo lido agora
+let currentReadingPosition = ""; 
 
-// Busca Ninja
 searchInput.addEventListener('keyup', function(e) {
     if (e.key === 'Enter') {
         const query = e.target.value.toLowerCase().trim();
         const tokens = query.split(/\s+/); 
         
         if (tokens.length >= 2) { 
-            const livro = tokens[0];
-            const capIndex = parseInt(tokens[1]) - 1; 
+            const livroDigitado = tokens[0]; // ex: "gn" ou "genesis"
+            const capIndex = parseInt(tokens[1]) - 1; // Capítulo 1 vira index 0
             const verBuscado = tokens[2] ? parseInt(tokens[2]) : null; 
             
-            // BIBLIA_TANAKH vem do arquivo biblia.js
-            if (typeof BIBLIA_TANAKH !== 'undefined' && BIBLIA_TANAKH[livro] && BIBLIA_TANAKH[livro][capIndex]) {
-                currentReadingPosition = query; // Salva a posição atual em memória
-                ribbon.classList.remove('saved'); // Reseta a fita
+            // MÁGICA DA BUSCA: Localiza o livro no Array pelo nome ou pela abreviação
+            const livroEncontrado = BIBLIA_TANAKH.find(livro => 
+                livro.abbrev.toLowerCase() === livroDigitado || 
+                // Remove os acentos matematicamente (Gênesis -> genesis)
+                livro.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === livroDigitado
+            );
+
+            // Se achou o livro E achou o capítulo
+            if (livroEncontrado && livroEncontrado.chapters[capIndex]) {
+                currentReadingPosition = query; 
+                ribbon.classList.remove('saved'); // Reseta a fita se houver
 
                 const capituloReal = tokens[1]; 
-                let capituloHTML = `<h2 style="color:var(--gold-dark); text-align:center; margin-bottom: 25px; font-size: 2rem; font-weight: normal;">${livro.toUpperCase()} ${capituloReal}</h2>`;
+                const nomeDoLivro = livroEncontrado.name; // Nome formatado bonito (Ex: Gênesis)
+                
+                let capituloHTML = `<h2 style="color:var(--gold-dark); text-align:center; margin-bottom: 25px; font-size: 2rem; font-weight: normal;">${nomeDoLivro} ${capituloReal}</h2>`;
                 let idParaRolar = null;
 
-                const versiculos = BIBLIA_TANAKH[livro][capIndex];
+                const versiculos = livroEncontrado.chapters[capIndex];
 
+                // Monta a página com os versículos
                 for (let i = 0; i < versiculos.length; i++) {
                     let num = i + 1; 
                     let texto = versiculos[i];
@@ -114,9 +127,11 @@ searchInput.addEventListener('keyup', function(e) {
 
                 displayText.innerHTML = capituloHTML;
                 
+                // Rola para a marcação suavemente
                 if (idParaRolar) {
                     setTimeout(() => {
-                        document.getElementById(idParaRolar).scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        const el = document.getElementById(idParaRolar);
+                        if(el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }, 100);
                 } else {
                     displayText.scrollTop = 0;
@@ -129,29 +144,32 @@ searchInput.addEventListener('keyup', function(e) {
     }
 });
 
-// Lógica de Salvar no Marcador (Fita)
+
+// ==========================================
+// 4. LÓGICA DO MARCADOR (FITA)
+// ==========================================
 ribbon.addEventListener('click', () => {
     if (currentReadingPosition !== "") {
         try {
             localStorage.setItem('pegasus_bible_bookmark', currentReadingPosition);
-            ribbon.classList.add('saved'); // A fita desce e fica Rosa
+            ribbon.classList.add('saved'); // Fita muda de cor indicando que salvou
         } catch(err) {
-            console.warn("Salvamento bloqueado pelo navegador.");
+            console.warn("Salvamento offline bloqueado pelo navegador.");
         }
     }
 });
 
-// Verifica se tem marcação ao carregar
+// Verifica se tem marcação salva ao carregar a página
 window.addEventListener('DOMContentLoaded', () => {
     try {
         const saved = localStorage.getItem('pegasus_bible_bookmark');
         if(saved) {
-            btnContinue.classList.remove('hidden'); // Mostra botão de continuar na capa
+            btnContinue.classList.remove('hidden'); // Mostra botão "Continuar Leitura" na capa
             
             btnContinue.addEventListener('click', () => {
                 searchInput.value = saved;
                 openBook();
-                // Simula o Enter para carregar a busca salva
+                // Simula o Enter para carregar a busca salva automaticamente
                 searchInput.dispatchEvent(new KeyboardEvent('keyup', {'key': 'Enter'}));
                 ribbon.classList.add('saved');
             });
