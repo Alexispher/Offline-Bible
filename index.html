@@ -7,41 +7,48 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Fundo de Estrelas Matemático (Zero lag) -->
+    <!-- Fundo de Estrelas -->
     <canvas id="starsCanvas"></canvas>
 
     <div class="app-container">
-        <!-- Título em Ouro Polido -->
-        <h1 class="gold-title">Tanakh</h1>
         
-        <!-- Busca Ninja -->
-        <div class="search-box">
-            <input type="text" id="omni-search" placeholder="Ex: lucas 2 27 (Aperte Enter)" autocomplete="off" autofocus>
+        <!-- ESTADO 1: A CAPA DO LIVRO -->
+        <div id="book-cover" class="book-layer active">
+            <div class="spine"></div> <!-- Lombada do livro -->
+            <div class="cover-content">
+                <h1 class="gold-title">Tanakh</h1>
+                <p class="cover-subtitle">PEGASUS OFFLINE READER</p>
+                <button id="btn-open-book">Abrir o Livro</button>
+                <button id="btn-continue" class="hidden">Continuar Leitura</button>
+            </div>
         </div>
 
-        <!-- Área do Livro (Viewport 3D) -->
-        <div class="book-viewport">
-            <div id="book-surface" class="page-flip-container">
-                <div class="reader-page" id="display-text">
-                    <div class="instruction-text">
-                        <h2 style="color: var(--dracula-pink); margin-bottom: 10px;">Bem-vindo ao PEGASUS Tanakh</h2>
-                        <p>Digite o nome do livro e o capítulo para ler inteiro.</p>
-                        <p>Exemplo: <b>genesis 1</b></p>
-                        <br>
-                        <p>Ou digite até o versículo para ir direto e marcá-lo.</p>
-                        <p>Exemplo: <b>lucas 2 27</b></p>
-                    </div>
+        <!-- ESTADO 2: O LIVRO ABERTO -->
+        <div id="book-inside" class="book-layer hidden">
+            <!-- Cabeçalho Estratégico -->
+            <div class="reader-header">
+                <button id="btn-close-book" title="Fechar Livro">✕</button>
+                <input type="text" id="omni-search" placeholder="Busca Rápida (Ex: genesis 1 ou lucas 2 27)" autocomplete="off">
+                <!-- Marcador de Fita Visual -->
+                <div id="bookmark-ribbon" title="Marcar esta página"></div>
+            </div>
+
+            <!-- Área de Leitura -->
+            <div class="reader-page" id="display-text">
+                <div class="instruction-text">
+                    <p>O livro está aberto.</p>
+                    <p>Use a barra superior para buscar.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Rodapé Minimalista -->
         <footer class="pegasus-footer">
             MADE BY PEGASUS FRAMEWORK
         </footer>
     </div>
 
-    <!-- Script principal -->
+    <!-- 1º O Banco de Dados, 2º O Motor -->
+    <script src="biblia.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
