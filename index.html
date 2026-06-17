@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tanakh - Pegasus Framework</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-mode">
+    <canvas id="starsCanvas"></canvas>
+
+    <div class="app-container">
+        <h1 class="gold-title">Tanakh</h1>
+        
+        <div class="search-box">
+            <input type="text" id="omni-search" placeholder="Digite rápido (ex: lucas 2 27)" autocomplete="off" autofocus>
+        </div>
+
+        <div class="book-viewport">
+            <div id="book-surface" class="page-flip-container">
+                <div class="reader-page" id="display-text">
+                    <p class="instruction">Digite um livro, capítulo e versículo acima para começar a leitura.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer class="pegasus-footer">
+            MADE BY PEGASUS FRAMEWORK
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
