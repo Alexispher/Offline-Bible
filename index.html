@@ -6,29 +6,42 @@
     <title>Tanakh - Pegasus Framework</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="dark-mode">
+<body>
+    <!-- Fundo de Estrelas Matemático (Zero lag) -->
     <canvas id="starsCanvas"></canvas>
 
     <div class="app-container">
+        <!-- Título em Ouro Polido -->
         <h1 class="gold-title">Tanakh</h1>
         
+        <!-- Busca Ninja -->
         <div class="search-box">
-            <input type="text" id="omni-search" placeholder="Digite rápido (ex: lucas 2 27)" autocomplete="off" autofocus>
+            <input type="text" id="omni-search" placeholder="Ex: lucas 2 27 (Aperte Enter)" autocomplete="off" autofocus>
         </div>
 
+        <!-- Área do Livro (Viewport 3D) -->
         <div class="book-viewport">
             <div id="book-surface" class="page-flip-container">
                 <div class="reader-page" id="display-text">
-                    <p class="instruction">Digite um livro, capítulo e versículo acima para começar a leitura.</p>
+                    <div class="instruction-text">
+                        <h2 style="color: var(--dracula-pink); margin-bottom: 10px;">Bem-vindo ao PEGASUS Tanakh</h2>
+                        <p>Digite o nome do livro e o capítulo para ler inteiro.</p>
+                        <p>Exemplo: <b>genesis 1</b></p>
+                        <br>
+                        <p>Ou digite até o versículo para ir direto e marcá-lo.</p>
+                        <p>Exemplo: <b>lucas 2 27</b></p>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- Rodapé Minimalista -->
         <footer class="pegasus-footer">
             MADE BY PEGASUS FRAMEWORK
         </footer>
     </div>
 
+    <!-- Script principal -->
     <script src="app.js"></script>
 </body>
 </html>
