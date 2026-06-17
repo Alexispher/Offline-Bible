@@ -53,13 +53,6 @@
         <section id="book-inside" class="book-layer hidden" aria-label="Livro aberto">
             <div class="reader-shell">
 
-                <!-- Marcadores laterais dos livros -->
-                <aside 
-                    id="book-tabs" 
-                    class="book-tabs" 
-                    aria-label="Marcadores dos livros"
-                ></aside>
-
                 <!-- Conteúdo principal do leitor -->
                 <main class="reader-content">
 
@@ -71,16 +64,6 @@
                             aria-label="Fechar livro"
                         >
                             ✕
-                        </button>
-
-                        <button 
-                            id="btn-prev-page" 
-                            class="page-btn" 
-                            type="button" 
-                            title="Capítulo anterior" 
-                            aria-label="Capítulo anterior"
-                        >
-                            ‹
                         </button>
 
                         <input 
@@ -102,16 +85,6 @@
                         </button>
 
                         <button 
-                            id="btn-next-page" 
-                            class="page-btn" 
-                            type="button" 
-                            title="Próximo capítulo" 
-                            aria-label="Próximo capítulo"
-                        >
-                            ›
-                        </button>
-
-                        <button 
                             id="bookmark-ribbon" 
                             type="button" 
                             title="Marcar esta página" 
@@ -130,7 +103,33 @@
                         </div>
                     </article>
 
+                    <!-- Dobrinha inferior esquerda: voltar capítulo -->
+                    <button 
+                        id="btn-prev-page" 
+                        class="page-corner page-corner-left" 
+                        type="button" 
+                        title="Capítulo anterior" 
+                        aria-label="Capítulo anterior"
+                    ></button>
+
+                    <!-- Dobrinha inferior direita: avançar capítulo -->
+                    <button 
+                        id="btn-next-page" 
+                        class="page-corner page-corner-right" 
+                        type="button" 
+                        title="Próximo capítulo" 
+                        aria-label="Próximo capítulo"
+                    ></button>
+
                 </main>
+
+                <!-- Marcadores laterais dos livros -->
+                <aside 
+                    id="book-tabs" 
+                    class="book-tabs" 
+                    aria-label="Marcadores dos livros"
+                ></aside>
+
             </div>
         </section>
 
@@ -142,7 +141,8 @@
     <!-- 
         IMPORTANTE:
         O arquivo biblia.js precisa vir antes do app.js.
-        Ele deve declarar:
+
+        O biblia.js deve declarar:
         window.BIBLIA_TANAKH = [...]
     -->
     <script src="biblia.js"></script>
