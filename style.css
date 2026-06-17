@@ -5,12 +5,23 @@
 :root {
     --bg-matte-black: #121214;
     --book-cover: #1a1a1e;
+    --book-inside: #18191f;
+
     --dracula-purple: #282a36;
     --dracula-pink: #ff79c6;
+
     --text-color: #e2e2e5;
+    --text-muted: #9aa0c2;
+
     --gold-light: #fbf5b7;
     --gold-dark: #a67c1e;
+
     --blue-muted: #6272a4;
+
+    --red-tab: #7b1230;
+    --red-tab-dark: #3a0b18;
+    --red-tab-light: #ff6f91;
+    --red-tab-text: #ffd6dc;
 
     --border-soft: rgba(255, 255, 255, 0.06);
     --shadow-heavy: 15px 15px 30px rgba(0, 0, 0, 0.8);
@@ -48,8 +59,9 @@ body {
     height: 100vh;
     z-index: -1;
     background:
-        radial-gradient(circle at top right, rgba(166, 124, 30, 0.08), transparent 35%),
-        radial-gradient(circle at bottom left, rgba(255, 121, 198, 0.05), transparent 35%),
+        radial-gradient(circle at top right, rgba(166, 124, 30, 0.09), transparent 34%),
+        radial-gradient(circle at bottom left, rgba(255, 121, 198, 0.05), transparent 34%),
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.018), transparent 42%),
         var(--bg-matte-black);
 }
 
@@ -72,10 +84,10 @@ body {
 
 .book-layer {
     width: 90%;
-    max-width: 760px;
-    height: 80vh;
+    max-width: 880px;
+    height: 82vh;
     background: var(--book-cover);
-    border-radius: 4px 15px 15px 4px;
+    border-radius: 4px 16px 16px 4px;
     box-shadow:
         var(--shadow-heavy),
         inset -2px 0 5px rgba(255, 255, 255, 0.05);
@@ -100,7 +112,8 @@ body {
     transform: scale(1) translateY(0);
 }
 
-.hidden {
+/* Não aplica display:none ao livro, para preservar animação */
+.hidden:not(.book-layer) {
     display: none !important;
 }
 
@@ -211,30 +224,39 @@ body {
     width: 100%;
     height: 100%;
     min-height: 0;
+    background:
+        linear-gradient(to right, rgba(255,255,255,0.018), transparent 12%),
+        var(--book-inside);
 }
 
 .reader-content {
+    position: relative;
     flex: 1;
     display: flex;
     flex-direction: column;
     min-width: 0;
+    background:
+        linear-gradient(to right, rgba(0,0,0,0.20), transparent 8%),
+        linear-gradient(to left, rgba(0,0,0,0.18), transparent 10%),
+        var(--book-inside);
 }
 
 /* ==========================================
-   MARCADORES LATERAIS DOS LIVROS
+   MARCADORES LATERAIS À DIREITA
 ========================================== */
 
 .book-tabs {
-    width: 106px;
-    padding: 18px 8px 18px 10px;
-    border-right: 1px solid var(--border-soft);
+    width: 122px;
+    padding: 18px 10px 18px 6px;
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
     overflow-y: auto;
     overflow-x: hidden;
-    background: linear-gradient(
-        to right,
-        rgba(10, 10, 12, 0.45),
-        rgba(255, 255, 255, 0.015)
-    );
+    background:
+        linear-gradient(
+            to left,
+            rgba(35, 8, 14, 0.56),
+            rgba(20, 20, 24, 0.12)
+        );
 }
 
 .book-tab {
@@ -242,38 +264,58 @@ body {
     min-height: 34px;
     margin-bottom: 7px;
     padding: 6px 8px;
-    border: 1px solid rgba(166, 124, 30, 0.35);
-    border-radius: 0 12px 12px 0;
-    background: rgba(20, 20, 24, 0.78);
-    color: var(--gold-light);
+    border: 1px solid rgba(180, 40, 60, 0.55);
+    border-right: none;
+    border-radius: 12px 0 0 12px;
+    background: linear-gradient(
+        to right,
+        rgba(123, 18, 48, 0.96),
+        rgba(58, 11, 24, 0.94)
+    );
+    color: var(--red-tab-text);
     font-family: monospace;
     font-size: 0.68rem;
+    font-weight: bold;
     letter-spacing: 0.2px;
     text-align: left;
     cursor: pointer;
-    transition:
-        transform var(--transition-soft),
-        background var(--transition-soft),
-        border-color var(--transition-soft),
-        color var(--transition-soft),
-        box-shadow var(--transition-soft);
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow:
+        -4px 4px 10px rgba(0, 0, 0, 0.28),
+        inset 1px 0 0 rgba(255, 255, 255, 0.04);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    transition:
+        transform 0.25s ease,
+        background 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease,
+        box-shadow 0.25s ease;
 }
 
 .book-tab:hover {
-    transform: translateX(4px);
-    background: rgba(166, 124, 30, 0.18);
-    border-color: var(--gold-light);
+    transform: translateX(-5px);
+    background: linear-gradient(
+        to right,
+        rgba(155, 28, 62, 0.98),
+        rgba(80, 16, 34, 0.98)
+    );
+    border-color: var(--red-tab-light);
+    color: #ffffff;
 }
 
 .book-tab.active {
-    background: rgba(255, 121, 198, 0.18);
-    color: var(--dracula-pink);
-    border-color: var(--dracula-pink);
-    box-shadow: 0 0 12px rgba(255, 121, 198, 0.22);
+    transform: translateX(-7px);
+    background: linear-gradient(
+        to right,
+        rgba(190, 42, 78, 0.98),
+        rgba(105, 18, 40, 0.98)
+    );
+    color: #ffffff;
+    border-color: #ff79a8;
+    box-shadow:
+        0 0 14px rgba(255, 80, 130, 0.35),
+        -5px 5px 12px rgba(0, 0, 0, 0.32);
 }
 
 /* Scroll dos marcadores */
@@ -286,7 +328,7 @@ body {
 }
 
 .book-tabs::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 111, 145, 0.28);
     border-radius: 4px;
 }
 
@@ -297,10 +339,11 @@ body {
 .reader-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 15px 25px 15px 28px;
+    gap: 10px;
+    padding: 15px 64px 15px 28px;
     border-bottom: 1px solid var(--border-soft);
     position: relative;
+    min-height: 64px;
 }
 
 #btn-close-book {
@@ -315,6 +358,7 @@ body {
 
 #btn-close-book:hover {
     color: var(--dracula-pink);
+    transform: scale(1.04);
 }
 
 #omni-search {
@@ -333,37 +377,21 @@ body {
     font-style: italic;
 }
 
-/* ==========================================
-   BOTÕES DE PÁGINA E IR
-========================================== */
-
-.page-btn,
 .go-btn {
+    height: 34px;
+    padding: 0 14px;
     border: 1px solid rgba(166, 124, 30, 0.45);
     background: rgba(20, 20, 24, 0.72);
     color: var(--gold-light);
     border-radius: 12px;
     cursor: pointer;
     font-family: monospace;
-    transition: var(--transition-soft);
-}
-
-.page-btn {
-    width: 34px;
-    height: 34px;
-    font-size: 1.35rem;
-    line-height: 1;
-}
-
-.go-btn {
-    height: 34px;
-    padding: 0 12px;
     font-size: 0.8rem;
     letter-spacing: 0.8px;
     text-transform: uppercase;
+    transition: var(--transition-soft);
 }
 
-.page-btn:hover,
 .go-btn:hover {
     background: rgba(166, 124, 30, 0.2);
     border-color: var(--gold-light);
@@ -426,7 +454,7 @@ body {
 .reader-page {
     flex: 1;
     overflow-y: auto;
-    padding: 30px 40px;
+    padding: 30px 46px 88px 40px;
     scroll-behavior: smooth;
 }
 
@@ -460,6 +488,96 @@ body {
 .reader-page::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 3px;
+}
+
+/* ==========================================
+   DOBRINHAS DE PÁGINA
+========================================== */
+
+.page-corner {
+    position: absolute;
+    bottom: 0;
+    width: 74px;
+    height: 74px;
+    border: none;
+    cursor: pointer;
+    z-index: 8;
+    background: transparent;
+    opacity: 0.82;
+    transition:
+        opacity 0.25s ease,
+        transform 0.25s ease,
+        filter 0.25s ease;
+}
+
+.page-corner::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    width: 74px;
+    height: 74px;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 245, 205, 0.94),
+        rgba(166, 124, 30, 0.54) 45%,
+        rgba(20, 20, 24, 0.14) 46%
+    );
+    box-shadow:
+        0 0 18px rgba(0, 0, 0, 0.34),
+        inset 0 0 8px rgba(255, 255, 255, 0.28);
+}
+
+.page-corner::after {
+    position: absolute;
+    bottom: 12px;
+    color: rgba(20, 20, 24, 0.78);
+    font-family: Georgia, serif;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.page-corner:hover {
+    opacity: 1;
+    filter: brightness(1.12);
+}
+
+.page-corner-right {
+    right: 0;
+}
+
+.page-corner-right::before {
+    right: 0;
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+    border-radius: 0 0 16px 0;
+}
+
+.page-corner-right::after {
+    content: "›";
+    right: 14px;
+}
+
+.page-corner-right:hover {
+    transform: translate(-3px, -3px);
+}
+
+.page-corner-left {
+    left: 0;
+}
+
+.page-corner-left::before {
+    left: 0;
+    clip-path: polygon(0 0, 100% 100%, 0 100%);
+    border-radius: 0 0 0 4px;
+    transform: scaleX(-1);
+}
+
+.page-corner-left::after {
+    content: "‹";
+    left: 14px;
+}
+
+.page-corner-left:hover {
+    transform: translate(3px, -3px);
 }
 
 /* ==========================================
@@ -501,34 +619,49 @@ input:focus-visible {
         flex-direction: column;
     }
 
+    .reader-content {
+        order: 0;
+        min-height: 0;
+    }
+
     .book-tabs {
+        order: 1;
         width: 100%;
         height: 58px;
         display: flex;
         overflow-x: auto;
         overflow-y: hidden;
         padding: 8px 12px;
-        border-right: none;
-        border-bottom: 1px solid var(--border-soft);
+        border-left: none;
+        border-top: 1px solid var(--border-soft);
+        background:
+            linear-gradient(
+                to top,
+                rgba(35, 8, 14, 0.56),
+                rgba(20, 20, 24, 0.12)
+            );
     }
 
     .book-tab {
         width: auto;
-        min-width: 72px;
+        min-width: 78px;
         margin-bottom: 0;
         margin-right: 8px;
         border-radius: 12px;
+        border-right: 1px solid rgba(180, 40, 60, 0.55);
         text-align: center;
         white-space: nowrap;
     }
 
-    .book-tab:hover {
+    .book-tab:hover,
+    .book-tab.active {
         transform: translateY(-2px);
     }
 
     .reader-header {
-        padding: 12px 18px;
-        gap: 6px;
+        padding: 12px 54px 12px 18px;
+        gap: 8px;
+        min-height: 58px;
     }
 
     #btn-close-book {
@@ -539,20 +672,14 @@ input:focus-visible {
         font-size: 0.92rem;
     }
 
-    .page-btn {
-        width: 30px;
-        height: 30px;
-        font-size: 1.15rem;
-    }
-
     .go-btn {
         height: 30px;
-        padding: 0 9px;
+        padding: 0 10px;
         font-size: 0.7rem;
     }
 
     #bookmark-ribbon {
-        right: 16px;
+        right: 18px;
         width: 18px;
         height: 34px;
     }
@@ -567,7 +694,26 @@ input:focus-visible {
     }
 
     .reader-page {
-        padding: 24px 24px;
+        padding: 24px 24px 72px 24px;
+    }
+
+    .page-corner,
+    .page-corner::before {
+        width: 58px;
+        height: 58px;
+    }
+
+    .page-corner::after {
+        bottom: 8px;
+        font-size: 1.45rem;
+    }
+
+    .page-corner-right::after {
+        right: 10px;
+    }
+
+    .page-corner-left::after {
+        left: 10px;
     }
 
     .gold-title {
@@ -584,6 +730,7 @@ input:focus-visible {
 @media (max-width: 430px) {
     .reader-header {
         flex-wrap: wrap;
+        padding-right: 50px;
     }
 
     #omni-search {
@@ -593,6 +740,6 @@ input:focus-visible {
     }
 
     .go-btn {
-        margin-right: 24px;
+        margin-right: 0;
     }
 }
