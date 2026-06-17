@@ -1,9 +1,11 @@
 :root {
     --bg-matte-black: #121214;
+    --book-cover: #1a1a1e;
     --dracula-purple: #282a36;
     --dracula-pink: #ff79c6;
-    --dracula-yellow: #f1fa8c;
     --text-color: #e2e2e5;
+    --gold-light: #fbf5b7;
+    --gold-dark: #a67c1e;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -12,44 +14,87 @@ body {
     font-family: 'Georgia', serif;
     background-color: var(--bg-matte-black);
     color: var(--text-color);
-    overflow: hidden; /* Trava a rolagem da página inteira */
+    overflow: hidden;
     height: 100vh;
 }
 
-/* Canvas das Estrelas */
 #starsCanvas {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
     z-index: -1;
-    pointer-events: none;
 }
 
-/* Layout Principal */
 .app-container {
-    max-width: 650px;
-    margin: 0 auto;
-    padding: 20px;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    width: 100%; height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
 }
 
-/* Título em Ouro Polido */
-.gold-title {
-    font-size: 3.5rem;
-    text-align: center;
-    font-weight: 700;
-    letter-spacing: 3px;
-    background: linear-gradient(135deg, #a67c1e 0%, #fbf5b7 25%, #ca9e3a 50%, #fbf5b7 75%, #aa771c 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.5));
-    background-size: 400% 400%;
-    animation: goldShine 6s ease infinite;
-    margin-bottom: 20px;
+/* O Livro Físico */
+.book-layer {
+    width: 90%; max-width: 600px;
+    height: 80vh;
+    background: var(--book-cover);
+    border-radius: 4px 15px 15px 4px;
+    box-shadow: 15px 15px 30px rgba(0,0,0,0.8), inset -2px 0 5px rgba(255,255,255,0.05);
+    position: absolute;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
+    display: flex; flex-direction: column;
 }
+
+.book-layer.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.95) translateY(20px);
+}
+
+.book-layer.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: scale(1) translateY(0);
+}
+
+/* A Capa */
+.spine {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 25px;
+    background: linear-gradient(to right, #0a0a0c, #1a1a1e, #0a0a0c);
+    border-radius: 4px 0 0 4px;
+    border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+.cover-content {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding-left: 25px; /* Compensa a lombada */
+}
+
+.gold-title {
+    font-size: 4rem; letter-spacing: 5px;
+    background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-light) 25%, #ca9e3a 50%, var(--gold-light) 75%, var(--gold-dark) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.8));
+    animation: goldShine 6s ease infinite;
+    background-size: 400% 400%;
+}
+
+.cover-subtitle {
+    margin-top: 10px; font-family: monospace;
+    letter-spacing: 3px; font-size: 0.8rem; opacity: 0.5;
+}
+
+#btn-open-book, #btn-continue {
+    margin-top: 50px; padding: 10px 30px;
+    background: transparent; border: 1px solid var(--gold-dark);
+    color: var(--gold-light); font-family: monospace;
+    border-radius: 20px; cursor: pointer; transition: 0.3s;
+}
+#btn-open-book:hover, #btn-continue:hover {
+    background: rgba(166, 124, 30, 0.2);
+}
+#btn-continue { margin-top: 15px; border-color: var(--dracula-pink); color: var(--dracula-pink); }
 
 @keyframes goldShine {
     0% { background-position: 0% 50% }
@@ -57,100 +102,60 @@ body {
     100% { background-position: 0% 50% }
 }
 
-/* Barra de Busca */
+/* O Interior do Livro */
+.reader-header {
+    display: flex; align-items: center;
+    padding: 15px 25px 15px 40px; /* Espaço da lombada */
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    position: relative;
+}
+
+#btn-close-book {
+    background: none; border: none; color: #6272a4;
+    font-size: 1.5rem; cursor: pointer; margin-right: 15px;
+}
+
 #omni-search {
-    width: 100%;
-    padding: 15px;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
-    background: rgba(40, 42, 54, 0.8);
-    color: #fff;
-    font-size: 1.2rem;
-    text-align: center;
+    flex: 1; background: transparent; border: none;
+    color: #fff; font-size: 1.1rem; font-family: 'Georgia', serif;
     outline: none;
-    transition: all 0.3s;
 }
+#omni-search::placeholder { color: #6272a4; font-style: italic; }
 
-#omni-search:focus {
-    border-color: var(--dracula-pink);
-    box-shadow: 0 0 15px rgba(255, 121, 198, 0.3);
+/* O Marcador de Fita Físico */
+#bookmark-ribbon {
+    position: absolute; right: 30px; top: -5px;
+    width: 20px; height: 40px;
+    background-color: #444; /* Cor desativada */
+    cursor: pointer;
+    transition: height 0.3s, background-color 0.3s;
+    /* Faz o formato de "bandeirinha" cortada embaixo */
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
 }
-
-/* Container do Livro e Animação 3D */
-.book-viewport {
-    flex: 1;
-    margin: 20px 0;
-    perspective: 1200px;
-    min-height: 0; /* Importante para o flexbox permitir rolagem interna */
-}
-
-.page-flip-container {
-    width: 100%;
-    height: 100%;
-    background: #181920;
-    border-radius: 8px;
-    padding: 25px;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.6), 0 10px 25px rgba(0,0,0,0.5);
-    transform-style: preserve-3d;
-    transition: transform 0.4s ease-in-out, opacity 0.3s;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Animação CSS da Página */
-.page-flip-animation-left {
-    transform: rotateY(-30deg) skewY(2deg) scale(0.95);
-    opacity: 0;
-}
-
-/* Área de Leitura (Com Rolagem Interna) */
-#display-text {
-    overflow-y: auto;
-    flex: 1;
-    padding-right: 15px; /* Espaço para a barra de rolagem */
-    scroll-behavior: smooth;
-}
-
-.instruction-text {
-    text-align: center;
-    margin-top: 20%;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 1.1rem;
-}
-
-/* Tarja Marca-Texto */
-.highlight-marker {
+#bookmark-ribbon:hover { height: 50px; }
+#bookmark-ribbon.saved {
     background-color: var(--dracula-pink);
-    color: #121214;
-    font-weight: bold;
-    padding: 3px 6px;
-    border-radius: 4px;
-    box-shadow: 0 0 8px var(--dracula-pink);
-    transition: background-color 0.3s;
+    height: 55px;
+    box-shadow: 0 0 10px rgba(255, 121, 198, 0.5);
 }
 
-/* Personalização da Barra de Rolagem (Estilo Dark) */
-#display-text::-webkit-scrollbar {
-    width: 8px;
+.reader-page {
+    flex: 1; overflow-y: auto;
+    padding: 30px 40px; scroll-behavior: smooth;
 }
-#display-text::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-}
-#display-text::-webkit-scrollbar-thumb {
-    background: var(--dracula-purple);
-    border-radius: 4px;
-}
-#display-text::-webkit-scrollbar-thumb:hover {
-    background: var(--dracula-pink);
+.instruction-text { text-align: center; color: #6272a4; margin-top: 20%; font-style: italic;}
+
+.highlight-marker {
+    background-color: rgba(255, 121, 198, 0.2);
+    color: var(--dracula-pink); border-radius: 4px; padding: 2px 4px;
 }
 
-/* Rodapé */
 .pegasus-footer {
-    text-align: center;
-    font-size: 0.75rem;
-    font-family: monospace;
-    letter-spacing: 2px;
-    opacity: 0.25;
-    padding-bottom: 10px;
+    position: absolute; bottom: 10px;
+    font-size: 0.7rem; font-family: monospace; letter-spacing: 2px; opacity: 0.2;
 }
+
+/* Scrollbar do livro */
+.reader-page::-webkit-scrollbar { width: 6px; }
+.reader-page::-webkit-scrollbar-track { background: transparent; }
+.reader-page::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
