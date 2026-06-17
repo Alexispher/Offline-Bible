@@ -1,3 +1,7 @@
+/* ==========================================
+   PEGASUS OFFLINE READER - STYLE.CSS
+========================================== */
+
 :root {
     --bg-matte-black: #121214;
     --book-cover: #1a1a1e;
@@ -6,40 +10,82 @@
     --text-color: #e2e2e5;
     --gold-light: #fbf5b7;
     --gold-dark: #a67c1e;
+    --blue-muted: #6272a4;
+
+    --border-soft: rgba(255, 255, 255, 0.06);
+    --shadow-heavy: 15px 15px 30px rgba(0, 0, 0, 0.8);
+    --transition-soft: 0.25s ease;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
 
 body {
-    font-family: 'Georgia', serif;
+    font-family: Georgia, serif;
     background-color: var(--bg-matte-black);
     color: var(--text-color);
     overflow: hidden;
     height: 100vh;
 }
 
+/* ==========================================
+   CANVAS DE FUNDO
+========================================== */
+
 #starsCanvas {
     position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
     z-index: -1;
+    background:
+        radial-gradient(circle at top right, rgba(166, 124, 30, 0.08), transparent 35%),
+        radial-gradient(circle at bottom left, rgba(255, 121, 198, 0.05), transparent 35%),
+        var(--bg-matte-black);
 }
+
+/* ==========================================
+   CONTAINER PRINCIPAL
+========================================== */
 
 .app-container {
-    width: 100%; height: 100vh;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
-/* O Livro Físico */
+/* ==========================================
+   CAMADA DO LIVRO
+========================================== */
+
 .book-layer {
-    width: 90%; max-width: 600px;
+    width: 90%;
+    max-width: 760px;
     height: 80vh;
     background: var(--book-cover);
     border-radius: 4px 15px 15px 4px;
-    box-shadow: 15px 15px 30px rgba(0,0,0,0.8), inset -2px 0 5px rgba(255,255,255,0.05);
+    box-shadow:
+        var(--shadow-heavy),
+        inset -2px 0 5px rgba(255, 255, 255, 0.05);
     position: absolute;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
-    display: flex; flex-direction: column;
+    transition:
+        transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .book-layer.hidden {
@@ -54,108 +100,499 @@ body {
     transform: scale(1) translateY(0);
 }
 
-/* A Capa */
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================
+   CAPA DO LIVRO
+========================================== */
+
 .spine {
     position: absolute;
-    left: 0; top: 0; bottom: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
     width: 25px;
-    background: linear-gradient(to right, #0a0a0c, #1a1a1e, #0a0a0c);
+    background: linear-gradient(
+        to right,
+        #0a0a0c,
+        #1a1a1e,
+        #0a0a0c
+    );
     border-radius: 4px 0 0 4px;
-    border-right: 1px solid rgba(255,255,255,0.05);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .cover-content {
-    flex: 1; display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding-left: 25px; /* Compensa a lombada */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    /* Compensa a lombada */
+    padding-left: 25px;
 }
 
 .gold-title {
-    font-size: 4rem; letter-spacing: 5px;
-    background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-light) 25%, #ca9e3a 50%, var(--gold-light) 75%, var(--gold-dark) 100%);
-    -webkit-background-clip: text; background-clip: text;
+    font-size: clamp(3rem, 8vw, 4.6rem);
+    letter-spacing: 5px;
+    background: linear-gradient(
+        135deg,
+        var(--gold-dark) 0%,
+        var(--gold-light) 25%,
+        #ca9e3a 50%,
+        var(--gold-light) 75%,
+        var(--gold-dark) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
     color: transparent;
-    filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.8));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
     animation: goldShine 6s ease infinite;
     background-size: 400% 400%;
 }
 
 .cover-subtitle {
-    margin-top: 10px; font-family: monospace;
-    letter-spacing: 3px; font-size: 0.8rem; opacity: 0.5;
+    margin-top: 10px;
+    font-family: monospace;
+    letter-spacing: 3px;
+    font-size: 0.8rem;
+    opacity: 0.5;
 }
 
-#btn-open-book, #btn-continue {
-    margin-top: 50px; padding: 10px 30px;
-    background: transparent; border: 1px solid var(--gold-dark);
-    color: var(--gold-light); font-family: monospace;
-    border-radius: 20px; cursor: pointer; transition: 0.3s;
+#btn-open-book,
+#btn-continue {
+    margin-top: 50px;
+    padding: 10px 30px;
+    background: transparent;
+    border: 1px solid var(--gold-dark);
+    color: var(--gold-light);
+    font-family: monospace;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: var(--transition-soft);
 }
-#btn-open-book:hover, #btn-continue:hover {
+
+#btn-open-book:hover,
+#btn-continue:hover {
     background: rgba(166, 124, 30, 0.2);
+    transform: translateY(-1px);
 }
-#btn-continue { margin-top: 15px; border-color: var(--dracula-pink); color: var(--dracula-pink); }
+
+#btn-continue {
+    margin-top: 15px;
+    border-color: var(--dracula-pink);
+    color: var(--dracula-pink);
+}
 
 @keyframes goldShine {
-    0% { background-position: 0% 50% }
-    50% { background-position: 100% 50% }
-    100% { background-position: 0% 50% }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
-/* O Interior do Livro */
+/* ==========================================
+   ESTRUTURA DO LIVRO ABERTO
+========================================== */
+
+.reader-shell {
+    flex: 1;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.reader-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* ==========================================
+   MARCADORES LATERAIS DOS LIVROS
+========================================== */
+
+.book-tabs {
+    width: 106px;
+    padding: 18px 8px 18px 10px;
+    border-right: 1px solid var(--border-soft);
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: linear-gradient(
+        to right,
+        rgba(10, 10, 12, 0.45),
+        rgba(255, 255, 255, 0.015)
+    );
+}
+
+.book-tab {
+    width: 100%;
+    min-height: 34px;
+    margin-bottom: 7px;
+    padding: 6px 8px;
+    border: 1px solid rgba(166, 124, 30, 0.35);
+    border-radius: 0 12px 12px 0;
+    background: rgba(20, 20, 24, 0.78);
+    color: var(--gold-light);
+    font-family: monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.2px;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        transform var(--transition-soft),
+        background var(--transition-soft),
+        border-color var(--transition-soft),
+        color var(--transition-soft),
+        box-shadow var(--transition-soft);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.book-tab:hover {
+    transform: translateX(4px);
+    background: rgba(166, 124, 30, 0.18);
+    border-color: var(--gold-light);
+}
+
+.book-tab.active {
+    background: rgba(255, 121, 198, 0.18);
+    color: var(--dracula-pink);
+    border-color: var(--dracula-pink);
+    box-shadow: 0 0 12px rgba(255, 121, 198, 0.22);
+}
+
+/* Scroll dos marcadores */
+.book-tabs::-webkit-scrollbar {
+    width: 4px;
+}
+
+.book-tabs::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.book-tabs::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+}
+
+/* ==========================================
+   CABEÇALHO DO LEITOR
+========================================== */
+
 .reader-header {
-    display: flex; align-items: center;
-    padding: 15px 25px 15px 40px; /* Espaço da lombada */
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 15px 25px 15px 28px;
+    border-bottom: 1px solid var(--border-soft);
     position: relative;
 }
 
 #btn-close-book {
-    background: none; border: none; color: #6272a4;
-    font-size: 1.5rem; cursor: pointer; margin-right: 15px;
+    background: none;
+    border: none;
+    color: var(--blue-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-right: 4px;
+    transition: var(--transition-soft);
+}
+
+#btn-close-book:hover {
+    color: var(--dracula-pink);
 }
 
 #omni-search {
-    flex: 1; background: transparent; border: none;
-    color: #fff; font-size: 1.1rem; font-family: 'Georgia', serif;
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.05rem;
+    font-family: Georgia, serif;
     outline: none;
 }
-#omni-search::placeholder { color: #6272a4; font-style: italic; }
 
-/* O Marcador de Fita Físico */
-#bookmark-ribbon {
-    position: absolute; right: 30px; top: -5px;
-    width: 20px; height: 40px;
-    background-color: #444; /* Cor desativada */
-    cursor: pointer;
-    transition: height 0.3s, background-color 0.3s;
-    /* Faz o formato de "bandeirinha" cortada embaixo */
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+#omni-search::placeholder {
+    color: var(--blue-muted);
+    font-style: italic;
 }
-#bookmark-ribbon:hover { height: 50px; }
+
+/* ==========================================
+   BOTÕES DE PÁGINA E IR
+========================================== */
+
+.page-btn,
+.go-btn {
+    border: 1px solid rgba(166, 124, 30, 0.45);
+    background: rgba(20, 20, 24, 0.72);
+    color: var(--gold-light);
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: monospace;
+    transition: var(--transition-soft);
+}
+
+.page-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.go-btn {
+    height: 34px;
+    padding: 0 12px;
+    font-size: 0.8rem;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.page-btn:hover,
+.go-btn:hover {
+    background: rgba(166, 124, 30, 0.2);
+    border-color: var(--gold-light);
+    transform: translateY(-1px);
+}
+
+/* ==========================================
+   MARCADOR DE FITA
+========================================== */
+
+#bookmark-ribbon {
+    position: absolute;
+    right: 30px;
+    top: -5px;
+    width: 20px;
+    height: 40px;
+    border: none;
+    background-color: #444;
+    cursor: pointer;
+    transition:
+        height 0.3s ease,
+        background-color 0.3s ease,
+        box-shadow 0.3s ease;
+    clip-path: polygon(
+        0 0,
+        100% 0,
+        100% 100%,
+        50% 80%,
+        0 100%
+    );
+}
+
+#bookmark-ribbon:hover {
+    height: 50px;
+}
+
 #bookmark-ribbon.saved {
     background-color: var(--dracula-pink);
     height: 55px;
     box-shadow: 0 0 10px rgba(255, 121, 198, 0.5);
 }
 
-.reader-page {
-    flex: 1; overflow-y: auto;
-    padding: 30px 40px; scroll-behavior: smooth;
+/* ==========================================
+   STATUS DA PÁGINA
+========================================== */
+
+.page-status {
+    padding: 8px 40px 0 40px;
+    color: var(--blue-muted);
+    font-family: monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    opacity: 0.82;
 }
-.instruction-text { text-align: center; color: #6272a4; margin-top: 20%; font-style: italic;}
+
+/* ==========================================
+   ÁREA DE LEITURA
+========================================== */
+
+.reader-page {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px 40px;
+    scroll-behavior: smooth;
+}
+
+.reader-page p {
+    max-width: 100%;
+}
+
+.instruction-text {
+    text-align: center;
+    color: var(--blue-muted);
+    margin-top: 20%;
+    font-style: italic;
+}
 
 .highlight-marker {
     background-color: rgba(255, 121, 198, 0.2);
-    color: var(--dracula-pink); border-radius: 4px; padding: 2px 4px;
-}
-
-.pegasus-footer {
-    position: absolute; bottom: 10px;
-    font-size: 0.7rem; font-family: monospace; letter-spacing: 2px; opacity: 0.2;
+    color: var(--dracula-pink);
+    border-radius: 4px;
+    padding: 2px 4px;
 }
 
 /* Scrollbar do livro */
-.reader-page::-webkit-scrollbar { width: 6px; }
-.reader-page::-webkit-scrollbar-track { background: transparent; }
-.reader-page::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+.reader-page::-webkit-scrollbar {
+    width: 6px;
+}
+
+.reader-page::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.reader-page::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+/* ==========================================
+   RODAPÉ
+========================================== */
+
+.pegasus-footer {
+    position: absolute;
+    bottom: 10px;
+    font-size: 0.7rem;
+    font-family: monospace;
+    letter-spacing: 2px;
+    opacity: 0.2;
+    pointer-events: none;
+}
+
+/* ==========================================
+   ACESSIBILIDADE VISUAL
+========================================== */
+
+button:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--dracula-pink);
+    outline-offset: 3px;
+}
+
+/* ==========================================
+   RESPONSIVO
+========================================== */
+
+@media (max-width: 720px) {
+    .book-layer {
+        width: 94%;
+        height: 84vh;
+        max-width: none;
+    }
+
+    .reader-shell {
+        flex-direction: column;
+    }
+
+    .book-tabs {
+        width: 100%;
+        height: 58px;
+        display: flex;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 8px 12px;
+        border-right: none;
+        border-bottom: 1px solid var(--border-soft);
+    }
+
+    .book-tab {
+        width: auto;
+        min-width: 72px;
+        margin-bottom: 0;
+        margin-right: 8px;
+        border-radius: 12px;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .book-tab:hover {
+        transform: translateY(-2px);
+    }
+
+    .reader-header {
+        padding: 12px 18px;
+        gap: 6px;
+    }
+
+    #btn-close-book {
+        font-size: 1.25rem;
+    }
+
+    #omni-search {
+        font-size: 0.92rem;
+    }
+
+    .page-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 1.15rem;
+    }
+
+    .go-btn {
+        height: 30px;
+        padding: 0 9px;
+        font-size: 0.7rem;
+    }
+
+    #bookmark-ribbon {
+        right: 16px;
+        width: 18px;
+        height: 34px;
+    }
+
+    #bookmark-ribbon:hover,
+    #bookmark-ribbon.saved {
+        height: 44px;
+    }
+
+    .page-status {
+        padding: 8px 22px 0 22px;
+    }
+
+    .reader-page {
+        padding: 24px 24px;
+    }
+
+    .gold-title {
+        letter-spacing: 3px;
+    }
+
+    .cover-subtitle {
+        text-align: center;
+        padding: 0 20px;
+        line-height: 1.5;
+    }
+}
+
+@media (max-width: 430px) {
+    .reader-header {
+        flex-wrap: wrap;
+    }
+
+    #omni-search {
+        order: 2;
+        flex-basis: 100%;
+        padding-top: 8px;
+    }
+
+    .go-btn {
+        margin-right: 24px;
+    }
+}
