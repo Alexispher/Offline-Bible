@@ -1,11 +1,11 @@
 // ==========================================
 // PEGASUS OFFLINE READER - APP.JS
-// Versão completa e corrigida
+// Livro navegável com marcadores laterais
 // ==========================================
 
 document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
-    // 1. ELEMENTOS PRINCIPAIS
+    // 1. ELEMENTOS
     // ==========================================
     const canvas = document.getElementById("starsCanvas");
     const ctx = canvas ? canvas.getContext("2d") : null;
@@ -17,37 +17,103 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnClose = document.getElementById("btn-close-book");
     const btnContinue = document.getElementById("btn-continue");
 
+    const btnPrevPage = document.getElementById("btn-prev-page");
+    const btnNextPage = document.getElementById("btn-next-page");
+    const btnGoPage = document.getElementById("btn-go-page");
+
     const searchInput = document.getElementById("omni-search");
     const ribbon = document.getElementById("bookmark-ribbon");
     const displayText = document.getElementById("display-text");
+    const bookTabs = document.getElementById("book-tabs");
+    const pageStatus = document.getElementById("page-status");
 
-    let currentReadingPosition = "";
     let stars = [];
     let animationFrameId = null;
 
-    // ==========================================
-    // 2. VALIDAÇÃO DO BANCO BÍBLICO
-    // ==========================================
-    const bibleData = window.BIBLIA_TANAKH || window.bibliaTanakh || window.biblia || null;
+    let currentBookIndex = 0;
+    let currentChapterIndex = 0;
+    let currentVerse = null;
+    let currentReadingPosition = "";
 
-    function bancoBiblicoDisponivel() {
+    // ==========================================
+    // 2. BANCO BÍBLICO
+    // ==========================================
+    const bibleData = window.BIBLIA_TANAKH || null;
+
+    const BOOK_NAMES = {
+        gn: "Gênesis",
+        ex: "Êxodo",
+        lv: "Levítico",
+        nm: "Números",
+        dt: "Deuteronômio",
+        js: "Josué",
+        jz: "Juízes",
+        rt: "Rute",
+        "1sm": "1 Samuel",
+        "2sm": "2 Samuel",
+        "1rs": "1 Reis",
+        "2rs": "2 Reis",
+        "1cr": "1 Crônicas",
+        "2cr": "2 Crônicas",
+        ed: "Esdras",
+        ne: "Neemias",
+        et: "Ester",
+        job: "Jó",
+        sl: "Salmos",
+        pv: "Provérbios",
+        ec: "Eclesiastes",
+        ct: "Cânticos",
+        is: "Isaías",
+        jr: "Jeremias",
+        lm: "Lamentações",
+        ez: "Ezequiel",
+        dn: "Daniel",
+        os: "Oseias",
+        jl: "Joel",
+        am: "Amós",
+        ob: "Obadias",
+        jn: "Jonas",
+        mq: "Miqueias",
+        na: "Naum",
+        hc: "Habacuque",
+        sf: "Sofonias",
+        ag: "Ageu",
+        zc: "Zacarias",
+        ml: "Malaquias",
+
+        mt: "Mateus",
+        mc: "Marcos",
+        lc: "Lucas",
+        jo: "João",
+        at: "Atos",
+        rm: "Romanos",
+        "1co": "1 Coríntios",
+        "2co": "2 Coríntios",
+        gl: "Gálatas",
+        ef: "Efésios",
+        fp: "Filipenses",
+        cl: "Colossenses",
+        "1ts": "1 Tessalonicenses",
+        "2ts": "2 Tessalonicenses",
+        "1tm": "1 Timóteo",
+        "2tm": "2 Timóteo",
+        tt: "Tito",
+        fm: "Filemom",
+        hb: "Hebreus",
+        tg: "Tiago",
+        "1pe": "1 Pedro",
+        "2pe": "2 Pedro",
+        "1jo": "1 João",
+        "2jo": "2 João",
+        "3jo": "3 João",
+        jd: "Judas",
+        ap: "Apocalipse"
+    };
+
+    function bancoDisponivel() {
         return Array.isArray(bibleData) && bibleData.length > 0;
     }
 
-    function mostrarErroBancoBiblico() {
-        if (!displayText) return;
-
-        displayText.innerHTML = `
-            <div class="instruction-text">
-                <p>Banco bíblico não encontrado.</p>
-                <p>Verifique se o arquivo <strong>biblia.js</strong> foi carregado antes do <strong>app.js</strong>.</p>
-            </div>
-        `;
-    }
-
-    // ==========================================
-    // 3. FUNÇÕES UTILITÁRIAS
-    // ==========================================
     function normalizarTexto(texto) {
         return String(texto || "")
             .toLowerCase()
@@ -65,32 +131,39 @@ document.addEventListener("DOMContentLoaded", () => {
             .replace(/'/g, "&#039;");
     }
 
-    function obterNomeDoLivro(livro) {
-        return livro.name || livro.nome || livro.book || livro.abbrev || "Livro";
+    function getBookAbbrev(livro) {
+        return String(livro?.abbrev || "").toLowerCase();
     }
 
-    function encontrarLivro(livroDigitado) {
-        if (!bancoBiblicoDisponivel()) return null;
+    function getBookName(livro) {
+        const abbrev = getBookAbbrev(livro);
+        return livro?.name || livro?.nome || BOOK_NAMES[abbrev] || abbrev.toUpperCase() || "Livro";
+    }
 
-        const termo = normalizarTexto(livroDigitado);
+    function atualizarStatus() {
+        if (!pageStatus || !bancoDisponivel()) return;
 
-        return bibleData.find((livro) => {
-            const abbrev = normalizarTexto(livro.abbrev);
-            const name = normalizarTexto(livro.name);
-            const nome = normalizarTexto(livro.nome);
-            const book = normalizarTexto(livro.book);
+        const livro = bibleData[currentBookIndex];
+        const nome = getBookName(livro);
+        const capitulo = currentChapterIndex + 1;
+        const total = livro.chapters?.length || 0;
 
-            return (
-                abbrev === termo ||
-                name === termo ||
-                nome === termo ||
-                book === termo
-            );
+        pageStatus.textContent = `${nome} ${capitulo} de ${total}`;
+    }
+
+    function atualizarTabsAtivas() {
+        if (!bookTabs) return;
+
+        const tabs = bookTabs.querySelectorAll(".book-tab");
+
+        tabs.forEach((tab) => {
+            const index = Number(tab.dataset.index);
+            tab.classList.toggle("active", index === currentBookIndex);
         });
     }
 
     // ==========================================
-    // 4. MOTOR DE ESTRELAS
+    // 3. CANVAS DE ESTRELAS LEVE
     // ==========================================
     function resizeCanvas() {
         if (!canvas || !ctx) return;
@@ -106,29 +179,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
         stars = [];
 
-        const quantidade = window.innerWidth < 768 ? 45 : 80;
+        const quantidade = window.innerWidth < 720 ? 42 : 75;
 
         for (let i = 0; i < quantidade; i++) {
             stars.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
-                size: Math.random() < 0.08 ? Math.random() * 2 + 1.2 : Math.random() * 1.1 + 0.2,
-                alpha: Math.random() * 0.8 + 0.2,
-                speed: 0.003 + Math.random() * 0.01
+                size: Math.random() < 0.1 ? Math.random() * 1.8 + 1 : Math.random() * 1 + 0.35,
+                alpha: Math.random() * 0.65 + 0.2,
+                speed: 0.0025 + Math.random() * 0.007,
+                drift: Math.random() * 0.08 + 0.02
             });
         }
+    }
+
+    function drawSoftNebula() {
+        if (!canvas || !ctx) return;
+
+        const gradient = ctx.createRadialGradient(
+            canvas.width * 0.72,
+            canvas.height * 0.22,
+            0,
+            canvas.width * 0.72,
+            canvas.height * 0.22,
+            canvas.width * 0.7
+        );
+
+        gradient.addColorStop(0, "rgba(166, 124, 30, 0.08)");
+        gradient.addColorStop(0.45, "rgba(255, 121, 198, 0.035)");
+        gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
     function animateStars() {
         if (!canvas || !ctx) return;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawSoftNebula();
 
         stars.forEach((star) => {
             star.alpha += star.speed;
 
-            if (star.alpha >= 1 || star.alpha <= 0.15) {
+            if (star.alpha >= 0.95 || star.alpha <= 0.16) {
                 star.speed *= -1;
+            }
+
+            star.y += star.drift * 0.05;
+
+            if (star.y > canvas.height + 4) {
+                star.y = -4;
+                star.x = Math.random() * canvas.width;
             }
 
             ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
@@ -140,7 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
         animationFrameId = requestAnimationFrame(animateStars);
     }
 
-    function iniciarEstrelas() {
+    function iniciarCanvas() {
         if (!canvas || !ctx) return;
 
         resizeCanvas();
@@ -153,7 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 5. NAVEGAÇÃO: CAPA / LIVRO ABERTO
+    // 4. ABRIR / FECHAR LIVRO
     // ==========================================
     function openBook() {
         if (!coverLayer || !insideLayer) return;
@@ -179,101 +281,122 @@ document.addEventListener("DOMContentLoaded", () => {
         coverLayer.classList.add("active");
     }
 
-    // deixa as funções acessíveis caso outro script precise chamar
     window.openBook = openBook;
     window.closeBook = closeBook;
 
     // ==========================================
-    // 6. MOTOR DE BUSCA
+    // 5. MARCADORES LATERAIS
     // ==========================================
-    function carregarCapitulo(query) {
+    function renderBookTabs() {
+        if (!bookTabs || !bancoDisponivel()) return;
+
+        bookTabs.innerHTML = "";
+
+        bibleData.forEach((livro, index) => {
+            const nome = getBookName(livro);
+            const abbrev = getBookAbbrev(livro);
+
+            const button = document.createElement("button");
+            button.className = "book-tab";
+            button.type = "button";
+            button.dataset.index = index;
+            button.title = nome;
+            button.textContent = nome;
+
+            button.addEventListener("click", () => {
+                carregarPorIndice(index, 0, null);
+            });
+
+            bookTabs.appendChild(button);
+        });
+
+        atualizarTabsAtivas();
+    }
+
+    // ==========================================
+    // 6. BUSCA E CARREGAMENTO
+    // ==========================================
+    function encontrarLivroPorTermo(termo) {
+        if (!bancoDisponivel()) return -1;
+
+        const termoNormalizado = normalizarTexto(termo);
+
+        return bibleData.findIndex((livro) => {
+            const abbrev = normalizarTexto(getBookAbbrev(livro));
+            const nome = normalizarTexto(getBookName(livro));
+
+            return abbrev === termoNormalizado || nome === termoNormalizado;
+        });
+    }
+
+    function montarReferencia(livroIndex, capituloIndex, versiculo = null) {
+        const livro = bibleData[livroIndex];
+        const abbrev = getBookAbbrev(livro);
+        const capitulo = capituloIndex + 1;
+
+        return versiculo ? `${abbrev} ${capitulo} ${versiculo}` : `${abbrev} ${capitulo}`;
+    }
+
+    function carregarPorIndice(livroIndex, capituloIndex, versiculo = null) {
         if (!displayText || !searchInput || !ribbon) return;
 
-        if (!bancoBiblicoDisponivel()) {
-            mostrarErroBancoBiblico();
-            return;
-        }
-
-        const busca = String(query || "").trim();
-
-        if (!busca) {
+        if (!bancoDisponivel()) {
             displayText.innerHTML = `
                 <div class="instruction-text">
-                    <p>Digite uma referência para buscar.</p>
-                    <p>Exemplo: <strong>gn 1</strong> ou <strong>gn 1 1</strong></p>
+                    <p>Banco bíblico não encontrado.</p>
+                    <p>Confira se o arquivo <strong>biblia.js</strong> foi carregado antes do <strong>app.js</strong>.</p>
                 </div>
             `;
             return;
         }
 
-        const tokens = busca.toLowerCase().split(/\s+/);
+        const livro = bibleData[livroIndex];
 
-        if (tokens.length < 2) {
+        if (!livro || !Array.isArray(livro.chapters)) {
             displayText.innerHTML = `
                 <div class="instruction-text">
-                    <p>Referência incompleta.</p>
-                    <p>Use o formato: <strong>livro capítulo</strong>.</p>
-                    <p>Exemplo: <strong>gn 1</strong></p>
+                    <p>Livro inválido.</p>
                 </div>
             `;
             return;
         }
 
-        const livroDigitado = tokens[0];
-        const capituloDigitado = parseInt(tokens[1], 10);
-        const versiculoDigitado = tokens[2] ? parseInt(tokens[2], 10) : null;
+        if (capituloIndex < 0) capituloIndex = 0;
+        if (capituloIndex >= livro.chapters.length) capituloIndex = livro.chapters.length - 1;
 
-        if (Number.isNaN(capituloDigitado) || capituloDigitado <= 0) {
-            displayText.innerHTML = `
-                <div class="instruction-text">
-                    <p>Capítulo inválido.</p>
-                    <p>Use um número válido após o nome do livro.</p>
-                </div>
-            `;
-            return;
-        }
-
-        const livroEncontrado = encontrarLivro(livroDigitado);
-
-        if (!livroEncontrado) {
-            displayText.innerHTML = `
-                <div class="instruction-text">
-                    <p>Livro não encontrado.</p>
-                    <p>Tente usar a abreviação. Exemplo: <strong>gn 1</strong></p>
-                </div>
-            `;
-            return;
-        }
-
-        const capIndex = capituloDigitado - 1;
-        const capitulo = livroEncontrado.chapters?.[capIndex];
+        const capitulo = livro.chapters[capituloIndex];
 
         if (!Array.isArray(capitulo)) {
             displayText.innerHTML = `
                 <div class="instruction-text">
                     <p>Capítulo não encontrado.</p>
-                    <p>Verifique se o capítulo ${capituloDigitado} existe neste livro.</p>
                 </div>
             `;
             return;
         }
 
-        currentReadingPosition = busca.toLowerCase();
+        currentBookIndex = livroIndex;
+        currentChapterIndex = capituloIndex;
+        currentVerse = versiculo || null;
+
+        currentReadingPosition = montarReferencia(currentBookIndex, currentChapterIndex, currentVerse);
+        searchInput.value = currentReadingPosition;
         ribbon.classList.remove("saved");
 
-        const nomeLivro = escaparHTML(obterNomeDoLivro(livroEncontrado));
+        const nomeLivro = escaparHTML(getBookName(livro));
+        const capituloNumero = capituloIndex + 1;
 
-        let capituloHTML = `
+        let html = `
             <h2 style="color:var(--gold-dark); text-align:center; margin-bottom:25px; font-size:2rem; font-weight:normal;">
-                ${nomeLivro} ${capituloDigitado}
+                ${nomeLivro} ${capituloNumero}
             </h2>
         `;
 
         let idParaRolar = null;
 
-        capitulo.forEach((versiculo, index) => {
+        capitulo.forEach((texto, index) => {
             const numero = index + 1;
-            const textoSeguro = escaparHTML(versiculo);
+            const textoSeguro = escaparHTML(texto);
 
             const numeroFormatado = `
                 <sup style="color:#6272a4; font-size:0.7em; margin-right:6px;">
@@ -281,8 +404,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 </sup>
             `;
 
-            if (versiculoDigitado && numero === versiculoDigitado) {
-                capituloHTML += `
+            if (versiculo && numero === versiculo) {
+                html += `
                     <p id="v${numero}" style="line-height:1.8; font-size:1.15rem; margin-bottom:15px;">
                         <span class="highlight-marker">${numeroFormatado}${textoSeguro}</span>
                     </p>
@@ -290,7 +413,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 idParaRolar = `v${numero}`;
             } else {
-                capituloHTML += `
+                html += `
                     <p id="v${numero}" style="line-height:1.8; font-size:1.15rem; margin-bottom:15px; opacity:0.9;">
                         ${numeroFormatado}${textoSeguro}
                     </p>
@@ -298,14 +421,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        displayText.innerHTML = capituloHTML;
+        displayText.innerHTML = html;
 
         if (idParaRolar) {
             setTimeout(() => {
-                const elemento = document.getElementById(idParaRolar);
+                const el = document.getElementById(idParaRolar);
 
-                if (elemento) {
-                    elemento.scrollIntoView({
+                if (el) {
+                    el.scrollIntoView({
                         behavior: "smooth",
                         block: "center"
                     });
@@ -314,12 +437,102 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             displayText.scrollTop = 0;
         }
+
+        atualizarStatus();
+        atualizarTabsAtivas();
     }
 
-    window.carregarCapitulo = carregarCapitulo;
+    function carregarPorBusca(query) {
+        if (!displayText) return;
+
+        const busca = String(query || "").trim();
+
+        if (!busca) {
+            displayText.innerHTML = `
+                <div class="instruction-text">
+                    <p>Digite uma referência.</p>
+                    <p>Exemplo: <strong>gn 1</strong> ou <strong>gn 1 1</strong></p>
+                </div>
+            `;
+            return;
+        }
+
+        const partes = busca.toLowerCase().split(/\s+/);
+
+        if (partes.length < 2) {
+            displayText.innerHTML = `
+                <div class="instruction-text">
+                    <p>Referência incompleta.</p>
+                    <p>Use: <strong>livro capítulo</strong>.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const livroDigitado = partes[0];
+        const capituloDigitado = parseInt(partes[1], 10);
+        const versiculoDigitado = partes[2] ? parseInt(partes[2], 10) : null;
+
+        if (Number.isNaN(capituloDigitado) || capituloDigitado <= 0) {
+            displayText.innerHTML = `
+                <div class="instruction-text">
+                    <p>Capítulo inválido.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const livroIndex = encontrarLivroPorTermo(livroDigitado);
+
+        if (livroIndex === -1) {
+            displayText.innerHTML = `
+                <div class="instruction-text">
+                    <p>Livro não encontrado.</p>
+                    <p>Tente usar a abreviação. Exemplo: <strong>gn 1</strong>.</p>
+                </div>
+            `;
+            return;
+        }
+
+        carregarPorIndice(livroIndex, capituloDigitado - 1, versiculoDigitado);
+    }
 
     // ==========================================
-    // 7. MARCADOR DE LEITURA
+    // 7. VOLTAR / AVANÇAR PÁGINA
+    // ==========================================
+    function proximoCapitulo() {
+        if (!bancoDisponivel()) return;
+
+        const livro = bibleData[currentBookIndex];
+
+        if (currentChapterIndex + 1 < livro.chapters.length) {
+            carregarPorIndice(currentBookIndex, currentChapterIndex + 1, null);
+            return;
+        }
+
+        if (currentBookIndex + 1 < bibleData.length) {
+            carregarPorIndice(currentBookIndex + 1, 0, null);
+        }
+    }
+
+    function capituloAnterior() {
+        if (!bancoDisponivel()) return;
+
+        if (currentChapterIndex > 0) {
+            carregarPorIndice(currentBookIndex, currentChapterIndex - 1, null);
+            return;
+        }
+
+        if (currentBookIndex > 0) {
+            const livroAnterior = bibleData[currentBookIndex - 1];
+            const ultimoCapitulo = livroAnterior.chapters.length - 1;
+
+            carregarPorIndice(currentBookIndex - 1, ultimoCapitulo, null);
+        }
+    }
+
+    // ==========================================
+    // 8. MARCADOR DE LEITURA
     // ==========================================
     function salvarMarcador() {
         if (!currentReadingPosition || !ribbon) return;
@@ -333,12 +546,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!saved) return;
 
-        if (searchInput) {
-            searchInput.value = saved;
-        }
-
         openBook();
-        carregarCapitulo(saved);
+        carregarPorBusca(saved);
 
         if (ribbon) {
             ribbon.classList.add("saved");
@@ -346,15 +555,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 8. EVENTOS
+    // 9. EVENTOS
     // ==========================================
     if (btnOpen) {
         btnOpen.addEventListener("click", () => {
             openBook();
 
-            if (!currentReadingPosition && searchInput && !searchInput.value.trim()) {
-                searchInput.value = "gn 1 1";
-                carregarCapitulo("gn 1 1");
+            if (!currentReadingPosition) {
+                carregarPorIndice(0, 0, 1);
             }
         });
     }
@@ -367,6 +575,20 @@ document.addEventListener("DOMContentLoaded", () => {
         btnContinue.addEventListener("click", continuarLeitura);
     }
 
+    if (btnGoPage) {
+        btnGoPage.addEventListener("click", () => {
+            carregarPorBusca(searchInput.value);
+        });
+    }
+
+    if (btnPrevPage) {
+        btnPrevPage.addEventListener("click", capituloAnterior);
+    }
+
+    if (btnNextPage) {
+        btnNextPage.addEventListener("click", proximoCapitulo);
+    }
+
     if (ribbon) {
         ribbon.addEventListener("click", salvarMarcador);
     }
@@ -374,7 +596,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (searchInput) {
         searchInput.addEventListener("keydown", (event) => {
             if (event.key === "Enter") {
-                carregarCapitulo(searchInput.value);
+                carregarPorBusca(searchInput.value);
             }
         });
     }
@@ -385,23 +607,33 @@ document.addEventListener("DOMContentLoaded", () => {
         if (document.hidden && animationFrameId) {
             cancelAnimationFrame(animationFrameId);
             animationFrameId = null;
-        } else if (!document.hidden && !animationFrameId) {
+        }
+
+        if (!document.hidden && !animationFrameId) {
             animateStars();
         }
     });
 
     // ==========================================
-    // 9. INICIALIZAÇÃO
+    // 10. INICIALIZAÇÃO
     // ==========================================
-    iniciarEstrelas();
+    iniciarCanvas();
 
-    const saved = localStorage.getItem("pegasus_bible_bookmark");
+    if (bancoDisponivel()) {
+        renderBookTabs();
+        atualizarStatus();
 
-    if (saved && btnContinue) {
-        btnContinue.classList.remove("hidden");
-    }
+        const saved = localStorage.getItem("pegasus_bible_bookmark");
 
-    if (!bancoBiblicoDisponivel()) {
-        console.warn("BIBLIA_TANAKH não foi encontrada. Verifique o arquivo biblia.js.");
+        if (saved && btnContinue) {
+            btnContinue.classList.remove("hidden");
+        }
+    } else if (displayText) {
+        displayText.innerHTML = `
+            <div class="instruction-text">
+                <p>Banco bíblico não encontrado.</p>
+                <p>Confira se o arquivo <strong>biblia.js</strong> existe e se foi carregado antes do <strong>app.js</strong>.</p>
+            </div>
+        `;
     }
 });
